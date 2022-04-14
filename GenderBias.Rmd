@@ -1,0 +1,66 @@
+---
+title: "Gender Bias OSM"
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+    social: menu
+    source: embed
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(tidyjson)
+library(magrittr)
+library(data.table)
+library(cowplot)
+library(vegan)
+library(hrbrthemes)
+library(maps)
+library(wordcloud)
+library(plotly)
+options(scipen = 9999)
+```
+
+## Hello this is a dashboard.
+
+
+
+
+### Chart A | dfadf
+I am going to put some text here
+```{r}
+simpson <- load("Simpson_GISRUK.RData")
+
+bind_rows(country_list) %>% 
+  group_by(Country_full) %>% 
+  summarise(Changeset = sum(Changeset)) -> country_df
+
+## use maps package
+theme_set(
+  theme_void()
+)
+
+world_map <- map_data("world")
+
+map_osm <- 
+  country_df %>% 
+  mutate(Country_full = case_when(Country_full == "United Kingdom" ~ "UK",
+                                  Country_full == "United States" ~ "USA",
+                                  TRUE ~ as.character(Country_full))) %>% 
+  right_join(world_map, by = c("Country_full" = "region"))
+
+map_osm %>% 
+  ggplot(aes(long, lat, group = group))+
+  geom_polygon(aes(fill = Changeset ), color = "white")+
+  scale_fill_viridis_c(option = "E")+
+  theme(legend.position=c(.15, .35)) -> p
+
+p
+```
+
+
+## Hi
+
+### Chart B
+
