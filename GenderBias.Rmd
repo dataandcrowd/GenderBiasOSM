@@ -28,14 +28,14 @@ library(gt)
 options(scipen = 9999)
 ```
 
-## Understanding the crowd’s temporal patterns and their spatial preferences is imperative: What we found
+## Our Main Findings
 - No.of Contributed Countries: Women were remarkably lower than that of men
 - However, such variabilities was identified by the disaggregation of gender and age
     * Men between 20s-50s & Women in 20s
 - Men were more likely to be spatial diverse than their female counterparts: **M: .67, W: .50**
 - However, this once again varied significantly by the age groups.
 
-### What we investigated
+### Why are We Doing This Research?
 #### Crowdsourced Data: Patchy Distribution Across Space & Time
 * A well-known feature of the data from citizen science projects is the patchy distribution of maps across space and time
 * This leaves global citizen science datasets with spatial and temporal gaps and redundancies
