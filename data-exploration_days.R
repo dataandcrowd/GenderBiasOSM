@@ -4,113 +4,7 @@ library(magrittr)
 library(rstatix)
 
 # 1. File import
-# this should give you a character vector, with each file name represented by an entry
-filenames <- list.files("Contributors/", pattern="*.json", full.names=TRUE) 
-#filenames <- list.files("Contributors_raw/", pattern="*.json", full.names=TRUE) 
-
-
-# Import data
-osm_json <-filenames %>% 
-  map(read_json) %>% 
-  reduce(bind_rows) %>% 
-  mutate(document.id = row_number())
-
-# Check data type
-class(osm_json)  
-
-
-# Take a look at the data
-osm_json %>%  
-  spread_all() %>% 
-  glimpse()
-
-# browse Types 
-osm_json %>% 
-  gather_object %>% 
-  json_types %>%
-  count(name, type) %>% 
-  print(n = Inf)
-
-
-# Glance at the first index
-osm_json %>% 
-  enter_object('contributor') %>% 
-  gather_object('index.1') %>% 
-  append_values_string() 
-
-
-osm_json %>% 
-  enter_object('contributor') %>% 
-  spread_values(name = jstring(name),
-                 uid = jstring(uid),
-                traces = jstring(traces),
-                blocks = jstring(blocks)
-                )
-
-
-osm_json %>%
-  as_tbl_json(drop.nulljson = T) %>% 
-  enter_object('changesets') %>%
-  spread_values(days = jstring(days)) 
-
-
-# Now convert them to tibble
-osm_json %>% 
-  spread_all() %>% 
-  as_data_frame.tbl_json() %>% 
-  mutate(contributor.since = as.Date(contributor.since)) -> osm_tibble
-
-class(osm_tibble)
-
-
-
-##
-duration <- as.numeric(osm_tibble$changesets.changes)
-summary(duration)
-quantile(duration, c(.01, .05, .32, .57, .98)) 
-
-
-# Drop users who contributed less than 2000 changesets
-osm_tibble %<>% 
-  filter(changesets.changes >= 1500)
-
-
-## year
-lubridate::year(osm_tibble$contributor.since) %>% hist(main = "User's First Year of Contribution")
-lubridate::year(osm_tibble$contributor.since) %>% table()
-
-
-
-
-# import Excel
-survey_original <- readxl::read_xlsx("OSM survey data.xlsx") %>% select(-c(`(Found) Username`, `6.a. If you selected Other, please specify:`))
-  
-survey_original %>% 
-  rename(username = `1. What is your OpenStreetMap Username?`,
-         gender = `2. What gender do you identify as?`,
-         age = `3. What is your age?`,
-         country_residence = `4. What is your country of residence?`,
-         nationality = `5. What is your nationality?`,
-         education = `6. What is your highest level of education?`
-         ) -> survey
-
-# Create a dataframe that contains all users names
-data.frame(filenames) -> usernames_df
-
-osm_tibble %>% 
-  select(document.id, contributor.name) %>% 
-  rename(username = contributor.name) -> osm_filtered
-
-usernames_df %<>% 
-  rename(username = filenames) %>% 
-  mutate(username = gsub("Contributors//","", .$username)) %>% 
-  mutate(username = gsub(".json","", .$username)) %>% 
-  left_join(survey, by = "username") %>% 
-  left_join(osm_filtered, by = "username") %>% 
-  drop_na(document.id, gender) %>%
-  filter(gender != "Prefer not to say") %>% 
-  as_tibble()
-
+load('OSM_WinOS.RData')
 
 usernames_df %>% 
   group_by(gender) %>%
@@ -128,13 +22,13 @@ usernames_df %>%
 ###################
 ### Days of Week ##
 ###################
-osm_json %>%
-  as_tbl_json(drop.nulljson = T) %>% 
-  enter_object('changesets') %>%
-  spread_values(days = jstring(days)) %>% 
-  filter(document.id %in% usernames_df$document.id) %>%  
-  as.data.frame() %>% 
-  pull(2)-> days
+#osm_json %>%
+#  as_tbl_json(drop.nulljson = T) %>% 
+#  enter_object('changesets') %>%
+#  spread_values(days = jstring(days)) %>% 
+#  filter(document.id %in% usernames_df$document.id) %>%  
+#  as.data.frame() %>% 
+#  pull(2)-> days
 
 data.frame(days) %>% 
   mutate(days = gsub("\\|$","", days)) %>%

@@ -129,25 +129,6 @@ usernames_df %>%
 #############--hours--#############
 ###################################
 
-osm_json %>%
-  as_tbl_json(drop.nulljson = T) %>% 
-  enter_object('changesets') %>%
-  spread_values(hours = jstring(hours)) %>% 
-  filter(document.id %in% usernames_df$document.id) %>%  
-  as.data.frame() %>% 
-  pull(2)-> hours
-
-data.frame(hours) %>% 
-  mutate(hours = gsub("\\|$","", hours)) %>%
-  separate_rows(hours, sep = "[|]") %>%
-  separate(hours, c("h00", "h01", "h02", "h03", "h04", "h05",
-                    "h06", "h07", "h08", "h09", "h10", "h11",
-                    "h12", "h13", "h14", "h15", "h16", "h17",
-                    "h18", "h19", "h20", "h21", "h22", "h23"
-  ), ",") %>%
-  mutate(across(where(is.character), as.numeric)) -> hours_df
-
-
 usernames_df %>% 
   bind_cols(hours_df) %>% 
   mutate(age = fct_relevel(age, "18-24", "25-29", "30-34", "35-39", "40-44", 
