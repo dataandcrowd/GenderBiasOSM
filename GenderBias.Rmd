@@ -119,7 +119,7 @@ that are different*]{style="color:green"}
 
 
 ```{r}
-simpson <- load("Simpson_GISRUK.RData")
+simpson <- load("AAG_Journal.RData")
 
 country_list %>% 
   purrr::map(pluck, 2) %>% 
